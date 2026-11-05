@@ -1,0 +1,309 @@
+
+.post-room-page {
+    min-height: 100vh;
+    padding: 32px 24px;
+    background: #f4f7fb;
+    color: #172b4d;
+    box-sizing: border-box;
+}
+
+.return-home-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 9px 14px;
+    border: 1px solid #cbd7e6;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #344967;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.return-home-button:hover {
+    background: #f0f5fc;
+    border-color: #3078e8;
+}
+
+.post-room-container {
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 28px;
+    background: #ffffff;
+    border: 1px solid #dce4ef;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(25, 45, 80, 0.05);
+    box-sizing: border-box;
+}
+
+.post-room-header {
+    margin-bottom: 24px;
+}
+
+.post-room-header h1 {
+    margin: 0 0 8px;
+    color: #14294b;
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.post-room-header p {
+    margin: 0;
+    color: #657894;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.post-room-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.room-image-section {
+    width: 100%;
+}
+
+.image-upload-area {
+    display: flex;
+    min-height: 150px;
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    border: 1.5px dashed #9aafce;
+    border-radius: 7px;
+    background: #fafcff;
+    cursor: pointer;
+    text-align: center;
+    box-sizing: border-box;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.image-upload-area:hover {
+    border-color: #3078e8;
+    background: #f3f7ff;
+}
+
+.upload-disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.upload-icon {
+    display: flex;
+    width: 38px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    color: #405779;
+}
+
+.upload-icon svg {
+    width: 32px;
+    height: 32px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.image-upload-area strong {
+    font-size: 13px;
+    color: #344967;
+}
+
+.image-upload-area input {
+    display: none;
+}
+
+.upload-button {
+    padding: 9px 17px;
+    border-radius: 5px;
+    background: #52667f;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.upload-hint {
+    color: #8290a5;
+    font-size: 11px;
+}
+
+.room-image-previews {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.room-image-preview {
+    position: relative;
+    min-width: 0;
+}
+
+.room-image-preview img {
+    display: block;
+    width: 100%;
+    height: 120px;
+    border: 1px solid #dce4ef;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.remove-image-button {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    width: 25px;
+    height: 25px;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: #34445a;
+    color: #ffffff;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.remove-image-button:hover {
+    background: #c62828;
+}
+
+.photo-number {
+    display: block;
+    margin-top: 5px;
+    color: #657894;
+    font-size: 11px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-field label {
+    color: #243853;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.form-field label span {
+    color: #d13b48;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+    width: 100%;
+    padding: 12px 13px;
+    border: 1px solid #cbd7e6;
+    border-radius: 5px;
+    background: #ffffff;
+    color: #243853;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+    color: #92a0b4;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+    border-color: #3078e8;
+    box-shadow: 0 0 0 3px rgba(48, 120, 232, 0.1);
+}
+
+.form-field textarea {
+    min-height: 110px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.character-count {
+    align-self: flex-end;
+    color: #8794a7;
+    font-size: 11px;
+}
+
+.form-error {
+    margin: 10px 0 0;
+    color: #c62828;
+    font-size: 12px;
+}
+
+.form-message {
+    padding: 12px 14px;
+    border-radius: 5px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.error-message {
+    border: 1px solid #f2caca;
+    background: #fff4f4;
+    color: #b42318;
+}
+
+.success-message {
+    border: 1px solid #b7e4c7;
+    background: #f0fbf4;
+    color: #197443;
+}
+
+.post-room-button {
+    width: 100%;
+    padding: 13px 16px;
+    border: none;
+    border-radius: 5px;
+    background: #3078e8;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.post-room-button:hover:not(:disabled) {
+    background: #2165cf;
+}
+
+.post-room-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+@media (max-width: 600px) {
+    .post-room-page {
+        padding: 16px 12px;
+    }
+
+    .post-room-container {
+        padding: 20px 16px;
+    }
+
+    .post-room-header h1 {
+        font-size: 22px;
+    }
+
+    .room-image-preview img {
+        height: 90px;
+    }
+}
