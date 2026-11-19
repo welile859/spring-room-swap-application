@@ -3,9 +3,12 @@ package com.codewithwegza.roomswapapplication.Services;
 import com.codewithwegza.roomswapapplication.Models.Sessions;
 import com.codewithwegza.roomswapapplication.Models.Users;
 import com.codewithwegza.roomswapapplication.Repository.SessionRepo;
+import com.codewithwegza.roomswapapplication.dto.AuthenticatedUser;
+import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.stereotype.Service;
 
@@ -26,7 +29,8 @@ public class SessionService {
         this.sessionRepository = sessionRepository;
     }
 
-    public Users getAuthenticatedUser(HttpServletRequest request) {
+    @Transactional(readOnly = true)
+    public AuthenticatedUser getAuthenticatedUser(HttpServletRequest request) {
 
         // Step 1: Get the cookies sent by the browser.
         Cookie[] cookies = request.getCookies();
@@ -79,7 +83,12 @@ public class SessionService {
 
         // Step 7: Return the user associated with this valid session.
         // The user ID comes from the database, not from the frontend.
-        return session.getUser();
+        Users user = session.getUser();
+
+        return new AuthenticatedUser(
+                user.getUserId(),
+                user.getFullName()
+        );
     }
 
     // Hash the token so we can compare it with the hash stored in PostgreSQL.

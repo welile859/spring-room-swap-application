@@ -1,31 +1,10 @@
 
 .post-room-page {
-    min-height: 100vh;
+    min-height: calc(100vh - 70px);
     padding: 32px 24px;
     background: #f4f7fb;
     color: #172b4d;
     box-sizing: border-box;
-}
-
-.return-home-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 20px;
-    padding: 9px 14px;
-    border: 1px solid #cbd7e6;
-    border-radius: 5px;
-    background: #ffffff;
-    color: #344967;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
-}
-
-.return-home-button:hover {
-    background: #f0f5fc;
-    border-color: #3078e8;
 }
 
 .post-room-container {
@@ -235,6 +214,25 @@
     min-height: 110px;
     resize: vertical;
     line-height: 1.5;
+}
+
+/* Location input and map-pin icon */
+.location-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.location-input-wrapper svg {
+    position: absolute;
+    left: 13px;
+    color: #8290a5;
+    font-size: 17px;
+    pointer-events: none;
+}
+
+.location-input-wrapper input {
+    padding-left: 40px;
 }
 
 .character-count {

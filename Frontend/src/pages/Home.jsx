@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
+
 import {
     FiHome,
     FiPlusSquare,
@@ -16,86 +18,109 @@ function Home() {
 
     const [selectedGender, setSelectedGender] = useState("All");
 
+    const [rooms, setRooms] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    const [currentUserId, setCurrentUserId] = useState(null);
+
     const navigate = useNavigate();
 
+    // Fetch room listings from backend
+    useEffect(() => {
+
+        const fetchRooms = async () => {
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:8080/api/rooms",
+                    {
+                        method: "GET",
+                        credentials: "include"
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error("Failed to retrieve room listings.");
+                }
+
+                const data = await response.json();
+
+                setRooms(data);
+
+            } catch (error) {
+
+                console.error("Error fetching rooms:", error);
+                setError(error.message);
+
+            } finally {
+
+                setLoading(false);
+
+            }
+        };
+
+        fetchRooms();
+
+    }, []);
+
+    // Fetch currently logged-in user
+    useEffect(() => {
+
+        const fetchCurrentUser = async () => {
+
+            try {
+
+                const response = await fetch(
+                    "http://localhost:8080/api/auth/me",
+                    {
+                        method: "GET",
+                        credentials: "include"
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error("Failed to retrieve current user.");
+                }
+
+                const data = await response.json();
+
+                setCurrentUserId(data.userId);
+
+            } catch (error) {
+
+                console.error("Error fetching current user:", error);
+
+            }
+        };
+
+        fetchCurrentUser();
+
+    }, []);
+
+    // Handle logout
     const handleLogout = async () => {
+
         try {
             await logoutUser();
             navigate("/login");
+
         } catch (error) {
             console.error("Logout failed:", error);
         }
     };
 
-    const rooms = [
-        {
-            id: 1,
-            title: "Cozy room in Hatfield",
-            price: 3500,
-            location: "Hatfield, Pretoria",
-            availability: "Available now",
-            gender: "Male",
-            available: true,
-            image: null
-        },
-        {
-            id: 2,
-            title: "Spacious room near campus",
-            price: 4000,
-            location: "Groenkloof, Pretoria",
-            availability: "Available 15 Nov",
-            gender: "Any",
-            available: false,
-            image: null
-        },
-        {
-            id: 3,
-            title: "Modern room in Arcadia",
-            price: 3800,
-            location: "Arcadia, Pretoria",
-            availability: "Available now",
-            gender: "Female",
-            available: true,
-            image: null
-        },
-        {
-            id: 4,
-            title: "Room in shared house",
-            price: 2800,
-            location: "Arcadia, Pretoria",
-            availability: "Available 1 Nov",
-            gender: "Any",
-            available: false,
-            image: null
-        },
-        {
-            id: 5,
-            title: "Large room in Hatfield",
-            price: 3200,
-            location: "Hatfield, Pretoria",
-            availability: "Available now",
-            gender: "Male",
-            available: true,
-            image: null
-        },
-        {
-            id: 6,
-            title: "Student room near campus",
-            price: 3000,
-            location: "Groenkloof, Pretoria",
-            availability: "Available 20 Nov",
-            gender: "Female",
-            available: false,
-            image: null
-        }
-    ];
-
+    // Filter rooms according to gender preference
     const filteredRooms =
         selectedGender === "All"
             ? rooms
-            : rooms.filter(room => room.gender === selectedGender);
+            : rooms.filter(
+                room => room.genderPreference === selectedGender
+            );
 
     return (
+
         <div className="app">
 
             <Navbar />
@@ -120,7 +145,10 @@ function Home() {
                             <span>Post a Room</span>
                         </button>
 
-                        <button className="sidebar-item">
+                        <button
+                            className="sidebar-item"
+                            onClick={() => navigate("/messages")}
+                        >
                             <FiMessageSquare />
                             <span>Messages</span>
                         </button>
@@ -142,7 +170,6 @@ function Home() {
 
                 </aside>
 
-
                 {/* Main content */}
                 <main className="main-content">
 
@@ -150,13 +177,13 @@ function Home() {
                         <h1>Available Rooms</h1>
                     </div>
 
-
                     {/* Filters */}
                     <div className="room-controls">
 
                         <div className="gender-filters">
 
                             {["All", "Male", "Female", "Any"].map(gender => (
+
                                 <button
                                     key={gender}
                                     className={
@@ -168,27 +195,40 @@ function Home() {
                                 >
                                     {gender}
                                 </button>
+
                             ))}
 
                         </div>
 
                         <select className="sort-select">
                             <option>Sort by: Newest</option>
-                            <option>Sort by: Price Low</option>
-                            <option>Sort by: Price High</option>
                         </select>
 
                     </div>
 
-
                     {/* Room grid */}
                     <div className="room-grid">
 
-                        {filteredRooms.map(room => (
+                        {loading && (
+                            <p>Loading room listings...</p>
+                        )}
+
+                        {!loading && error && (
+                            <p>{error}</p>
+                        )}
+
+                        {!loading && !error && filteredRooms.length === 0 && (
+                            <p>No rooms found.</p>
+                        )}
+
+                        {!loading && !error && filteredRooms.map(room => (
+
                             <RoomCard
-                                key={room.id}
+                                key={room.roomId}
                                 room={room}
+                                currentUserId={currentUserId}
                             />
+
                         ))}
 
                     </div>
@@ -198,6 +238,7 @@ function Home() {
             </div>
 
         </div>
+
     );
 }
 

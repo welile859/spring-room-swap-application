@@ -1,52 +1,80 @@
+
 import React from "react";
 import {
     FiMapPin,
-    FiCalendar,
-    FiImage
+    FiImage,
+    FiUsers,
+    FiMessageSquare
 } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
-function RoomCard({ room }) {
+function RoomCard({ room, currentUserId }) {
+
+    const navigate = useNavigate();
+
+    const roomImages = room.images?.slice(0, 3) || [];
+
+    const openChat = () => {
+        navigate(`/chat/${room.ownerId}`);
+    };
+
+    const isOwnRoom = Number(room.ownerId) === Number(currentUserId);
+
     return (
         <div className="room-card">
 
-            <div className="room-image">
-                {room.image ? (
-                    <img src={room.image} alt={room.title} />
+            <div className="room-image-gallery">
+
+                {roomImages.length > 0 ? (
+
+                    roomImages.map((image, index) => (
+                        <img
+                            key={index}
+                            src={image}
+                            alt={`${room.roomTitle} - Image ${index + 1}`}
+                        />
+                    ))
+
                 ) : (
+
                     <div className="image-placeholder">
                         <FiImage />
                     </div>
+
                 )}
+
             </div>
 
             <div className="room-card-content">
 
-                <h3>{room.title}</h3>
+                <h3>{room.roomTitle}</h3>
 
                 <div className="room-info">
                     <FiMapPin />
                     <span>{room.location}</span>
                 </div>
 
-                <div className="room-info">
-                    <strong>R {room.price.toLocaleString()} / month</strong>
-                </div>
-
-                <div className="room-info">
-                    <FiCalendar />
-                    <span>{room.availability}</span>
-                </div>
+                <p className="room-description">
+                    {room.description}
+                </p>
 
                 <div className="room-card-footer">
-                    <span className={`gender-tag ${room.gender.toLowerCase()}`}>
-                        {room.gender}
+
+                    <span className={`gender-tag ${room.genderPreference.toLowerCase()}`}>
+                        <FiUsers />
+                        {room.genderPreference}
                     </span>
 
-                    {room.available && (
-                        <span className="available-tag">
-                            Available now
-                        </span>
+                    {!isOwnRoom && (
+                        <button
+                            className="view-details"
+                            onClick={openChat}
+                        >
+                            <FiMessageSquare />
+                            Message
+                        </button>
                     )}
+
                 </div>
 
             </div>
@@ -56,3 +84,4 @@ function RoomCard({ room }) {
 }
 
 export default RoomCard;
+

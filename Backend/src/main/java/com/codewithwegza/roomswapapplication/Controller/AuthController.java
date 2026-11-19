@@ -1,37 +1,41 @@
+
 package com.codewithwegza.roomswapapplication.Controller;
+
 import com.codewithwegza.roomswapapplication.Services.AuthService;
-import com.codewithwegza.roomswapapplication.Repository.TokenRepo;
+import com.codewithwegza.roomswapapplication.Services.SessionService;
+import com.codewithwegza.roomswapapplication.dto.AuthenticatedUser;
 import com.codewithwegza.roomswapapplication.dto.LoginRequest;
 import com.codewithwegza.roomswapapplication.dto.RegisterRequest;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    AuthService authService;
+    private final AuthService authService;
+    private final SessionService sessionService;
 
-    public AuthController(AuthService authService, TokenRepo tokenRepo){
+    public AuthController(
+            AuthService authService,
+            SessionService sessionService) {
+
         this.authService = authService;
+        this.sessionService = sessionService;
     }
 
-
     @PostMapping("/register")
-    public String Register(@RequestBody RegisterRequest registerRequest){
-
+    public String Register(@RequestBody RegisterRequest registerRequest) {
         return authService.register(registerRequest);
-
-
     }
 
     @GetMapping("/verify")
@@ -43,20 +47,17 @@ public class AuthController {
         return ResponseEntity.ok(result);
     }
 
-
     @PostMapping("/login")
     public ResponseEntity<String> login(
             @RequestBody LoginRequest request,
             HttpServletResponse response) {
 
-        // If authentication fails, AuthService throws an exception.
-        // The cookie is therefore created only after successful login.
         String sessionId = authService.login(request);
 
         ResponseCookie cookie = ResponseCookie
                 .from("SESSION_ID", sessionId)
                 .httpOnly(true)
-                .secure(false) // Local HTTP development only
+                .secure(false)
                 .path("/")
                 .maxAge(Duration.ofMinutes(10))
                 .sameSite("Lax")
@@ -87,6 +88,11 @@ public class AuthController {
         return "Successfully logged out.";
     }
 
+    // Retrieve currently authenticated user
+    @GetMapping("/me")
+    public AuthenticatedUser getCurrentUser(
+            HttpServletRequest request) {
 
-
+        return sessionService.getAuthenticatedUser(request);
+    }
 }

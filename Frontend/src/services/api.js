@@ -27,13 +27,18 @@ export const registerUser = async (registerData) => {
 export const createRoom = async (roomData, images) => {
     const formData = new FormData();
 
-    formData.append("roomData", JSON.stringify(roomData));
+    // Add room details
+    formData.append("roomTitle", roomData.roomTitle);
+    formData.append("description", roomData.description);
+    formData.append("location", roomData.location);
+    formData.append("genderPreferrence", roomData.genderPreference);
 
+    // Add room pictures
     images.forEach((image) => {
-        formData.append("images", image);
+        formData.append("roomPictures", image);
     });
 
-    const response = await api.post("/rooms", formData, {
+    const response = await api.post("/post/room", formData, {
         headers: {
             "Content-Type": "multipart/form-data",
         },
@@ -43,3 +48,4 @@ export const createRoom = async (roomData, images) => {
 };
 
 export default api;
+
