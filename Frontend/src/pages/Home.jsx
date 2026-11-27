@@ -6,7 +6,9 @@ import {
     FiPlusSquare,
     FiMessageSquare,
     FiUser,
-    FiLogOut
+    FiLogOut,
+    FiLogIn,
+    FiUserPlus
 } from "react-icons/fi";
 
 import { useNavigate } from "react-router-dom";
@@ -26,33 +28,37 @@ function Home() {
 
     const navigate = useNavigate();
 
-    // Fetch the logged-in user and room listings.
+    // Fetch room listings and check whether a user is logged in.
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [userResponse, roomsResponse] = await Promise.all([
-                    fetch("http://localhost:8080/api/auth/me", {
-                        credentials: "include"
-                    }),
-
-                    fetch("http://localhost:8080/api/rooms", {
-                        credentials: "include"
-                    })
-                ]);
-
-                if (!userResponse.ok) {
-                    throw new Error("Failed to retrieve current user.");
-                }
+                // Retrieve rooms without requiring authentication.
+                const roomsResponse = await fetch(
+                    "http://localhost:8080/api/rooms"
+                );
 
                 if (!roomsResponse.ok) {
                     throw new Error("Failed to retrieve room listings.");
                 }
 
-                const userData = await userResponse.json();
                 const roomsData = await roomsResponse.json();
-
-                setCurrentUserId(Number(userData.userId));
                 setRooms(roomsData);
+
+                // Check whether the visitor is logged in.
+                const userResponse = await fetch(
+                    "http://localhost:8080/api/auth/me",
+                    {
+                        credentials: "include"
+                    }
+                );
+
+                if (userResponse.ok) {
+                    const userData = await userResponse.json();
+                    setCurrentUserId(Number(userData.userId));
+                } else {
+                    // Visitor is not logged in.
+                    setCurrentUserId(null);
+                }
 
             } catch (error) {
                 console.error("Error loading home page:", error);
@@ -70,19 +76,26 @@ function Home() {
     const handleLogout = async () => {
         try {
             await logoutUser();
-            navigate("/login");
+            setCurrentUserId(null);
+            navigate("/home");
 
         } catch (error) {
             console.error("Logout failed:", error);
         }
     };
 
-    // Only show rooms belonging to other users.
+    // Check whether the visitor is logged in.
+    const isLoggedIn = currentUserId !== null;
+
+    // Show all rooms to visitors.
+    // Registered users do not see their own room listings.
     const otherUsersRooms = rooms.filter(
-        room => Number(room.ownerId) !== currentUserId
+        room =>
+            !isLoggedIn ||
+            Number(room.ownerId) !== currentUserId
     );
 
-    // Filter other users' rooms according to gender preference.
+    // Filter rooms according to gender preference.
     const filteredRooms =
         selectedGender === "All"
             ? otherUsersRooms
@@ -109,7 +122,11 @@ function Home() {
 
                         <button
                             className="sidebar-item"
-                            onClick={() => navigate("/post-room")}
+                            onClick={() =>
+                                navigate(
+                                    isLoggedIn ? "/post-room" : "/login"
+                                )
+                            }
                         >
                             <FiPlusSquare />
                             <span>Post a Room</span>
@@ -117,7 +134,11 @@ function Home() {
 
                         <button
                             className="sidebar-item"
-                            onClick={() => navigate("/messages")}
+                            onClick={() =>
+                                navigate(
+                                    isLoggedIn ? "/messages" : "/login"
+                                )
+                            }
                         >
                             <FiMessageSquare />
                             <span>Messages</span>
@@ -125,7 +146,11 @@ function Home() {
 
                         <button
                             className="sidebar-item"
-                            onClick={() => navigate("/profile")}
+                            onClick={() =>
+                                navigate(
+                                    isLoggedIn ? "/profile" : "/login"
+                                )
+                            }
                         >
                             <FiUser />
                             <span>Profile</span>
@@ -133,13 +158,40 @@ function Home() {
 
                     </nav>
 
-                    <button
-                        className="sidebar-item logout"
-                        onClick={handleLogout}
-                    >
-                        <FiLogOut />
-                        <span>Logout</span>
-                    </button>
+                    {/* Authentication options */}
+                    {isLoggedIn ? (
+
+                        <button
+                            className="sidebar-item logout"
+                            onClick={handleLogout}
+                        >
+                            <FiLogOut />
+                            <span>Logout</span>
+                        </button>
+
+                    ) : (
+
+                        <div className="sidebar-auth">
+
+                            <button
+                                className="sidebar-item"
+                                onClick={() => navigate("/login")}
+                            >
+                                <FiLogIn />
+                                <span>Login</span>
+                            </button>
+
+                            <button
+                                className="sidebar-item"
+                                onClick={() => navigate("/register")}
+                            >
+                                <FiUserPlus />
+                                <span>Register</span>
+                            </button>
+
+                        </div>
+
+                    )}
 
                 </aside>
 
@@ -191,7 +243,7 @@ function Home() {
                         )}
 
                         {!loading && !error && filteredRooms.length === 0 && (
-                            <p>No rooms from other users are currently available.</p>
+                            <p>No rooms are currently available.</p>
                         )}
 
                         {!loading && !error && filteredRooms.map(room => (

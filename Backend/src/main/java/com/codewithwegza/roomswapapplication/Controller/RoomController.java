@@ -1,14 +1,13 @@
+
 package com.codewithwegza.roomswapapplication.Controller;
 
 import com.codewithwegza.roomswapapplication.Services.RoomService;
-import com.codewithwegza.roomswapapplication.Services.SessionService;
+import com.codewithwegza.roomswapapplication.Services.AuthService;
 import com.codewithwegza.roomswapapplication.dto.PostRoomRequest;
 import com.codewithwegza.roomswapapplication.dto.AuthenticatedUser;
 import com.codewithwegza.roomswapapplication.dto.RoomListingResponse;
 
-import jakarta.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,19 +16,26 @@ import java.util.List;
 @RequestMapping("/api")
 public class RoomController {
 
-    @Autowired
-    RoomService roomService;
+    private final RoomService roomService;
+    private final AuthService authService;
 
-    @Autowired
-    SessionService sessionService;
+    public RoomController(
+            RoomService roomService,
+            AuthService authService) {
+
+        this.roomService = roomService;
+        this.authService = authService;
+    }
 
     @PostMapping("/post/room")
     public String postRoom(
             @ModelAttribute PostRoomRequest postRoomRequest,
-            HttpServletRequest request) throws Exception {
+            Authentication authentication) throws Exception {
+
+        Long userId = Long.parseLong(authentication.getName());
 
         AuthenticatedUser user =
-                sessionService.getAuthenticatedUser(request);
+                authService.getAuthenticatedUser(userId);
 
         return roomService.postRoom(postRoomRequest, user);
     }

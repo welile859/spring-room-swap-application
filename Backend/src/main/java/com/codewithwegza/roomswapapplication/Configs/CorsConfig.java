@@ -23,10 +23,14 @@ public class CorsConfig {
                                 "GET",
                                 "POST",
                                 "PUT",
+                                "PATCH",
                                 "DELETE",
                                 "OPTIONS"
                         )
-                        .allowedHeaders("*")
+                        .allowedHeaders(
+                                "Content-Type",
+                                "X-XSRF-TOKEN"
+                        )
                         .allowCredentials(true);
             }
         };

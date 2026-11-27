@@ -2,18 +2,17 @@
 package com.codewithwegza.roomswapapplication.Controller;
 
 import com.codewithwegza.roomswapapplication.Services.AuthService;
-import com.codewithwegza.roomswapapplication.Services.SessionService;
 import com.codewithwegza.roomswapapplication.dto.AuthenticatedUser;
 import com.codewithwegza.roomswapapplication.dto.LoginRequest;
 import com.codewithwegza.roomswapapplication.dto.RegisterRequest;
+import org.springframework.security.web.csrf.CsrfToken;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -23,18 +22,18 @@ import java.time.Duration;
 public class AuthController {
 
     private final AuthService authService;
-    private final SessionService sessionService;
 
-    public AuthController(
-            AuthService authService,
-            SessionService sessionService) {
-
+    public AuthController(AuthService authService) {
         this.authService = authService;
-        this.sessionService = sessionService;
+    }
+
+    @GetMapping("/csrf")
+    public CsrfToken getCsrfToken(CsrfToken csrfToken) {
+        return csrfToken;
     }
 
     @PostMapping("/register")
-    public String Register(@RequestBody RegisterRequest registerRequest) {
+    public String register(@RequestBody RegisterRequest registerRequest) {
         return authService.register(registerRequest);
     }
 
@@ -52,10 +51,10 @@ public class AuthController {
             @RequestBody LoginRequest request,
             HttpServletResponse response) {
 
-        String sessionId = authService.login(request);
+        String jwtToken = authService.login(request);
 
         ResponseCookie cookie = ResponseCookie
-                .from("SESSION_ID", sessionId)
+                .from("ACCESS_TOKEN", jwtToken)
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
@@ -72,27 +71,33 @@ public class AuthController {
     }
 
     @DeleteMapping("/logout")
-    public String logout(
-            HttpServletRequest logOutRequest,
+    public ResponseEntity<String> logout(
             HttpServletResponse response) {
 
-        authService.logout(logOutRequest);
+        ResponseCookie cookie = ResponseCookie
+                .from("ACCESS_TOKEN", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(Duration.ZERO)
+                .sameSite("Lax")
+                .build();
 
-        Cookie sessionCookie = new Cookie("SESSION_ID", "");
-        sessionCookie.setHttpOnly(true);
-        sessionCookie.setPath("/");
-        sessionCookie.setMaxAge(0);
+        response.addHeader(
+                HttpHeaders.SET_COOKIE,
+                cookie.toString()
+        );
 
-        response.addCookie(sessionCookie);
-
-        return "Successfully logged out.";
+        return ResponseEntity.ok("Successfully logged out.");
     }
 
-    // Retrieve currently authenticated user
     @GetMapping("/me")
     public AuthenticatedUser getCurrentUser(
-            HttpServletRequest request) {
+            Authentication authentication) {
 
-        return sessionService.getAuthenticatedUser(request);
+        Long userId = Long.parseLong(authentication.getName());
+
+        // We'll implement this lookup in the next step.
+        return authService.getAuthenticatedUser(userId);
     }
 }

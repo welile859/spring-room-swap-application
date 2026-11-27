@@ -9,26 +9,59 @@ import Chat from "./pages/Chat";
 import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
 function App() {
     return (
         <BrowserRouter>
             <Routes>
 
-                {/* Authentication */}
+                {/* Public pages */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/profile" element={<Profile />} />
-
-                {/* Main application */}
                 <Route path="/home" element={<Home />} />
-                <Route path="/post-room" element={<PostRoom />} />
-                <Route path="/messages" element={<Messages />} />
-                <Route path="/chat/:recipientId" element={<Chat />} />
 
-                {/* Default */}
+                {/* Protected pages */}
+                <Route
+                    path="/post-room"
+                    element={
+                        <ProtectedRoute>
+                            <PostRoom />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/messages"
+                    element={
+                        <ProtectedRoute>
+                            <Messages />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/chat/:recipientId"
+                    element={
+                        <ProtectedRoute>
+                            <Chat />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute>
+                            <Profile />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Default page */}
                 <Route
                     path="/"
-                    element={<Navigate to="/login" replace />}
+                    element={<Navigate to="/home" replace />}
                 />
 
             </Routes>

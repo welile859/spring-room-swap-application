@@ -7,6 +7,24 @@ const api = axios.create({
         "Content-Type": "application/json",
     },
     withCredentials: true,
+
+    // Allow Axios to read the CSRF cookie on cross-origin requests.
+    withXSRFToken: true,
+    xsrfCookieName: "XSRF-TOKEN",
+    xsrfHeaderName: "X-XSRF-TOKEN",
+});
+
+// Obtain a CSRF token before every request that changes data.
+api.interceptors.request.use(async (config) => {
+    const method = config.method?.toLowerCase();
+
+    const requiresCsrf = ["post", "put", "patch", "delete"];
+
+    if (requiresCsrf.includes(method)) {
+        await api.get("/auth/csrf");
+    }
+
+    return config;
 });
 
 export const loginUser = async (loginData) => {
@@ -48,4 +66,3 @@ export const createRoom = async (roomData, images) => {
 };
 
 export default api;
-

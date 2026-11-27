@@ -1,11 +1,10 @@
 package com.codewithwegza.roomswapapplication.Models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -24,4 +23,7 @@ public class Users {
 
     Boolean isVerified;
 
+    // One user can have multiple room listings.
+    @OneToMany(mappedBy = "user")
+    private List<Rooms> rooms;
 }

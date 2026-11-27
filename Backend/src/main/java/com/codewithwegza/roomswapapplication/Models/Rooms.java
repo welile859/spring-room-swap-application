@@ -1,3 +1,4 @@
+
 package com.codewithwegza.roomswapapplication.Models;
 
 import jakarta.persistence.*;
@@ -25,7 +26,7 @@ public class Rooms {
     private String genderPreference;
 
     // Multiple room posts can belong to one user.
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private Users user;
 }

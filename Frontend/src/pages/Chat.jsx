@@ -36,10 +36,12 @@ function Chat() {
     // Load the current user, recipient name, and chat history.
     useEffect(() => {
         let active = true;
+        let messageSubscription = null;
 
         setError("");
         setMessages([]);
         setCurrentUser(null);
+        setRecipientName("RoomSwap User");
 
         if (
             !Number.isInteger(numericRecipientId) ||
@@ -49,10 +51,9 @@ function Chat() {
             return;
         }
 
-        let messageSubscription = null;
-
         const loadChat = async () => {
             try {
+                // Retrieve the currently authenticated user.
                 const userResponse = await fetch(
                     "http://localhost:8080/api/auth/me",
                     {
@@ -61,7 +62,9 @@ function Chat() {
                 );
 
                 if (!userResponse.ok) {
-                    throw new Error("Could not retrieve user details.");
+                    throw new Error(
+                        "Could not retrieve user details."
+                    );
                 }
 
                 const user = await userResponse.json();
@@ -70,12 +73,16 @@ function Chat() {
 
                 setCurrentUser(user);
 
-                if (user.userId === numericRecipientId) {
-                    setError("You cannot start a conversation with yourself.");
+                const currentUserId = Number(user.userId);
+
+                if (currentUserId === numericRecipientId) {
+                    setError(
+                        "You cannot start a conversation with yourself."
+                    );
                     return;
                 }
 
-                // Retrieve the recipient's name from existing conversations.
+                // Retrieve the recipient's name from conversations.
                 try {
                     const conversationsResponse = await fetch(
                         "http://localhost:8080/api/chat/conversations",
@@ -90,11 +97,14 @@ function Chat() {
 
                         const conversation = conversations.find(
                             item =>
-                                item.otherUserId === numericRecipientId
+                                Number(item.otherUserId) ===
+                                numericRecipientId
                         );
 
                         if (conversation && active) {
-                            setRecipientName(conversation.otherUserName);
+                            setRecipientName(
+                                conversation.otherUserName
+                            );
                         }
                     }
                 } catch (nameError) {
@@ -110,6 +120,7 @@ function Chat() {
 
                     console.log("Connected to WebSocket!");
 
+                    // Subscribe to private messages.
                     messageSubscription = websocketService.subscribe(
                         "/user/queue/messages",
                         receivedMessage => {
@@ -118,20 +129,39 @@ function Chat() {
                                 receivedMessage
                             );
 
-                            // Only display messages from this recipient.
-                            if (
-                                receivedMessage.senderId !==
-                                numericRecipientId
-                            ) {
+                            // Identify the sender and recipient.
+                            const senderId = Number(
+                                receivedMessage.senderId
+                            );
+
+                            const recipientId = Number(
+                                receivedMessage.recipientId
+                            );
+
+                            // Accept messages in either direction
+                            // within the currently open conversation.
+                            const isCurrentConversation =
+                                (
+                                    senderId === numericRecipientId &&
+                                    recipientId === currentUserId
+                                ) ||
+                                (
+                                    senderId === currentUserId &&
+                                    recipientId === numericRecipientId
+                                );
+
+                            if (!isCurrentConversation) {
                                 return;
                             }
 
+                            // Prevent duplicate messages.
                             setMessages(previousMessages => {
-                                const alreadyExists = previousMessages.some(
-                                    msg =>
-                                        msg.messageId ===
-                                        receivedMessage.messageId
-                                );
+                                const alreadyExists =
+                                    previousMessages.some(
+                                        msg =>
+                                            msg.messageId ===
+                                            receivedMessage.messageId
+                                    );
 
                                 if (alreadyExists) {
                                     return previousMessages;
@@ -164,12 +194,15 @@ function Chat() {
                         .then(previousMessages => {
                             if (!active) return;
 
+                            // Combine history with any messages
+                            // received while history was loading.
                             setMessages(currentMessages => {
                                 const combinedMessages = [
                                     ...previousMessages,
                                     ...currentMessages
                                 ];
 
+                                // Remove duplicates using messageId.
                                 const uniqueMessages = Array.from(
                                     new Map(
                                         combinedMessages.map(msg => [
@@ -193,6 +226,7 @@ function Chat() {
                             }
                         });
                 });
+
             } catch (fetchError) {
                 if (active) {
                     console.error(
@@ -207,6 +241,7 @@ function Chat() {
 
         loadChat();
 
+        // Clean up the WebSocket subscription.
         return () => {
             active = false;
 
@@ -216,6 +251,7 @@ function Chat() {
 
             websocketService.disconnect();
         };
+
     }, [numericRecipientId]);
 
     // Send a message to the recipient.
@@ -226,14 +262,20 @@ function Chat() {
 
         if (!trimmedMessage) return;
 
-        if (!currentUser || currentUser.userId === numericRecipientId) {
+        if (
+            !currentUser ||
+            Number(currentUser.userId) === numericRecipientId
+        ) {
             return;
         }
 
-        websocketService.sendMessage("/app/private-message", {
-            message: trimmedMessage,
-            recipientId: numericRecipientId
-        });
+        websocketService.sendMessage(
+            "/app/private-message",
+            {
+                message: trimmedMessage,
+                recipientId: numericRecipientId
+            }
+        );
 
         setMessage("");
     };
@@ -299,7 +341,8 @@ function Chat() {
                 {messages.map(msg => {
                     const isSender =
                         currentUser &&
-                        msg.senderId === currentUser.userId;
+                        Number(msg.senderId) ===
+                        Number(currentUser.userId);
 
                     return (
                         <div
@@ -335,7 +378,9 @@ function Chat() {
                 <input
                     type="text"
                     value={message}
-                    onChange={event => setMessage(event.target.value)}
+                    onChange={event =>
+                        setMessage(event.target.value)
+                    }
                     placeholder="Type a message..."
                     autoComplete="off"
                 />

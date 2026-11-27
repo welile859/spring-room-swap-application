@@ -1,26 +1,31 @@
 
 package com.codewithwegza.roomswapapplication.Configs;
-import org.springframework.messaging.simp.config.ChannelRegistration;
-import com.codewithwegza.roomswapapplication.Services.SessionService;
+
+import com.codewithwegza.roomswapapplication.Services.AuthService;
+import com.codewithwegza.roomswapapplication.Services.JwtService;
+
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final SessionService sessionService;
+    private final JwtService jwtService;
+    private final AuthService authService;
     private final WebSocketChannelInterceptor webSocketChannelInterceptor;
 
     public WebSocketConfig(
-            SessionService sessionService,
+            JwtService jwtService,
+            AuthService authService,
             WebSocketChannelInterceptor webSocketChannelInterceptor) {
 
-        this.sessionService = sessionService;
+        this.jwtService = jwtService;
+        this.authService = authService;
         this.webSocketChannelInterceptor = webSocketChannelInterceptor;
     }
 
@@ -29,7 +34,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         registry.addEndpoint("/ws")
                 .addInterceptors(
-                        new SessionHandshakeInterceptor(sessionService)
+                        new SessionHandshakeInterceptor(jwtService, authService)
                 )
                 .setAllowedOrigins("http://localhost:5173")
                 .withSockJS();
@@ -37,6 +42,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
+
         registry.enableSimpleBroker("/topic", "/queue");
 
         registry.setApplicationDestinationPrefixes("/app");
@@ -46,7 +52,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
+
         registration.interceptors(webSocketChannelInterceptor);
     }
 }
-

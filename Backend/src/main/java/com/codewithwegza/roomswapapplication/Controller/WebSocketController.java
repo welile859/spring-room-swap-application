@@ -26,31 +26,33 @@ public class WebSocketController {
         this.chatMessageService = chatMessageService;
     }
 
+
     @MessageMapping("/private-message")
     public void sendPrivateMessage(
             Message message,
             Principal principal) {
 
-        // Identify sender using authenticated connection
+        // Identify sender using authenticated connection.
         Long senderId = Long.valueOf(principal.getName());
 
-        // Identify recipient
+        // Identify recipient.
         Long recipientId = message.getRecipientId();
 
-        // Prevent users from messaging themselves
+        // Prevent users from messaging themselves.
         if (recipientId == null || senderId.equals(recipientId)) {
             throw new IllegalArgumentException(
                     "You cannot send a message to yourself."
             );
         }
 
-        // Save message in PostgreSQL
+        // Save message in PostgreSQL.
         ChatMessage savedMessage = chatMessageService.saveMessage(
                 senderId,
                 recipientId,
                 message.getMessage()
         );
 
+        // Create response containing the saved message.
         ChatMessageResponse response = new ChatMessageResponse(
                 savedMessage.getMessageId(),
                 senderId,
@@ -59,16 +61,24 @@ public class WebSocketController {
                 savedMessage.getSentAt()
         );
 
-        // Deliver the saved message privately
+        // Deliver message to recipient.
         messagingTemplate.convertAndSendToUser(
                 recipientId.toString(),
                 "/queue/messages",
                 response
         );
 
+        // Also deliver the message to sender.
+        messagingTemplate.convertAndSendToUser(
+                senderId.toString(),
+                "/queue/messages",
+                response
+        );
+
         System.out.println(
-                "Message saved and sent from user "
+                "Message saved and delivered from user "
                         + senderId + " to user " + recipientId
         );
     }
+
 }

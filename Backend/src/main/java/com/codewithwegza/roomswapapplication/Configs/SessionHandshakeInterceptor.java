@@ -1,8 +1,11 @@
+
 package com.codewithwegza.roomswapapplication.Configs;
 
-import com.codewithwegza.roomswapapplication.Services.SessionService;
+import com.codewithwegza.roomswapapplication.Services.AuthService;
+import com.codewithwegza.roomswapapplication.Services.JwtService;
 import com.codewithwegza.roomswapapplication.dto.AuthenticatedUser;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.http.server.ServerHttpRequest;
@@ -15,10 +18,15 @@ import java.util.Map;
 
 public class SessionHandshakeInterceptor implements HandshakeInterceptor {
 
-    private final SessionService sessionService;
+    private final JwtService jwtService;
+    private final AuthService authService;
 
-    public SessionHandshakeInterceptor(SessionService sessionService) {
-        this.sessionService = sessionService;
+    public SessionHandshakeInterceptor(
+            JwtService jwtService,
+            AuthService authService) {
+
+        this.jwtService = jwtService;
+        this.authService = authService;
     }
 
     @Override
@@ -36,8 +44,29 @@ public class SessionHandshakeInterceptor implements HandshakeInterceptor {
                 servletRequest.getServletRequest();
 
         try {
+
+            String token = null;
+
+            Cookie[] cookies = httpRequest.getCookies();
+
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+
+                    if ("ACCESS_TOKEN".equals(cookie.getName())) {
+                        token = cookie.getValue();
+                        break;
+                    }
+                }
+            }
+
+            if (token == null || !jwtService.isTokenValid(token)) {
+                return false;
+            }
+
+            Long userId = jwtService.extractUserId(token);
+
             AuthenticatedUser user =
-                    sessionService.getAuthenticatedUser(httpRequest);
+                    authService.getAuthenticatedUser(userId);
 
             attributes.put("userId", user.userId());
             attributes.put("fullName", user.fullName());
@@ -51,7 +80,6 @@ public class SessionHandshakeInterceptor implements HandshakeInterceptor {
         } catch (RuntimeException exception) {
 
             System.out.println("WebSocket authentication failed!");
-            System.out.println(exception.getMessage());
 
             return false;
         }
