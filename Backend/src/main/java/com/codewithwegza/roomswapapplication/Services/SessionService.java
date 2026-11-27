@@ -87,7 +87,8 @@ public class SessionService {
 
         return new AuthenticatedUser(
                 user.getUserId(),
-                user.getFullName()
+                user.getFullName(),
+                user.getEmail()
         );
     }
 

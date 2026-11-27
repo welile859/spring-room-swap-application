@@ -65,7 +65,11 @@ function Login() {
             <header className="auth-header">
 
                 <div className="auth-logo">
-                    RoomsSwap
+                    <img
+                        src="/U-dubswap.jfif"
+                        alt="RoomSwap Logo"
+                        className="auth-logo-image"
+                    />
                 </div>
 
                 <nav className="auth-nav">

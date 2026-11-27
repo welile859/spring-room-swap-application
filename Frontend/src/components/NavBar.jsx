@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
     FiSearch,
@@ -8,12 +9,18 @@ import {
 function Navbar() {
     return (
         <header className="navbar">
+
             <div className="navbar-left">
-                <h2 className="logo">RoomsSwap</h2>
+                <img
+                    src="/U-dubswap.jfif"
+                    alt="RoomSwap Logo"
+                    className="logo"
+                />
             </div>
 
             <div className="navbar-search">
                 <FiSearch />
+
                 <input
                     type="text"
                     placeholder="Search rooms, areas, or universities..."
@@ -29,6 +36,7 @@ function Navbar() {
                     <FiUser />
                 </button>
             </div>
+
         </header>
     );
 }

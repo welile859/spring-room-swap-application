@@ -9,99 +9,65 @@ import {
     FiLogOut
 } from "react-icons/fi";
 
+import { useNavigate } from "react-router-dom";
+
 import Navbar from "../components/Navbar";
 import RoomCard from "../components/RoomCard";
-import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../services/api";
 
 function Home() {
-
     const [selectedGender, setSelectedGender] = useState("All");
 
     const [rooms, setRooms] = useState([]);
+    const [currentUserId, setCurrentUserId] = useState(null);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const [currentUserId, setCurrentUserId] = useState(null);
-
     const navigate = useNavigate();
 
-    // Fetch room listings from backend
+    // Fetch the logged-in user and room listings.
     useEffect(() => {
-
-        const fetchRooms = async () => {
-
+        const fetchData = async () => {
             try {
-
-                const response = await fetch(
-                    "http://localhost:8080/api/rooms",
-                    {
-                        method: "GET",
+                const [userResponse, roomsResponse] = await Promise.all([
+                    fetch("http://localhost:8080/api/auth/me", {
                         credentials: "include"
-                    }
-                );
+                    }),
 
-                if (!response.ok) {
-                    throw new Error("Failed to retrieve room listings.");
-                }
-
-                const data = await response.json();
-
-                setRooms(data);
-
-            } catch (error) {
-
-                console.error("Error fetching rooms:", error);
-                setError(error.message);
-
-            } finally {
-
-                setLoading(false);
-
-            }
-        };
-
-        fetchRooms();
-
-    }, []);
-
-    // Fetch currently logged-in user
-    useEffect(() => {
-
-        const fetchCurrentUser = async () => {
-
-            try {
-
-                const response = await fetch(
-                    "http://localhost:8080/api/auth/me",
-                    {
-                        method: "GET",
+                    fetch("http://localhost:8080/api/rooms", {
                         credentials: "include"
-                    }
-                );
+                    })
+                ]);
 
-                if (!response.ok) {
+                if (!userResponse.ok) {
                     throw new Error("Failed to retrieve current user.");
                 }
 
-                const data = await response.json();
+                if (!roomsResponse.ok) {
+                    throw new Error("Failed to retrieve room listings.");
+                }
 
-                setCurrentUserId(data.userId);
+                const userData = await userResponse.json();
+                const roomsData = await roomsResponse.json();
+
+                setCurrentUserId(Number(userData.userId));
+                setRooms(roomsData);
 
             } catch (error) {
+                console.error("Error loading home page:", error);
+                setError(error.message);
 
-                console.error("Error fetching current user:", error);
-
+            } finally {
+                setLoading(false);
             }
         };
 
-        fetchCurrentUser();
-
+        fetchData();
     }, []);
 
-    // Handle logout
+    // Handle logout.
     const handleLogout = async () => {
-
         try {
             await logoutUser();
             navigate("/login");
@@ -111,16 +77,20 @@ function Home() {
         }
     };
 
-    // Filter rooms according to gender preference
+    // Only show rooms belonging to other users.
+    const otherUsersRooms = rooms.filter(
+        room => Number(room.ownerId) !== currentUserId
+    );
+
+    // Filter other users' rooms according to gender preference.
     const filteredRooms =
         selectedGender === "All"
-            ? rooms
-            : rooms.filter(
+            ? otherUsersRooms
+            : otherUsersRooms.filter(
                 room => room.genderPreference === selectedGender
             );
 
     return (
-
         <div className="app">
 
             <Navbar />
@@ -153,7 +123,10 @@ function Home() {
                             <span>Messages</span>
                         </button>
 
-                        <button className="sidebar-item">
+                        <button
+                            className="sidebar-item"
+                            onClick={() => navigate("/profile")}
+                        >
                             <FiUser />
                             <span>Profile</span>
                         </button>
@@ -170,7 +143,7 @@ function Home() {
 
                 </aside>
 
-                {/* Main content */}
+                {/* Main Content */}
                 <main className="main-content">
 
                     <div className="page-header">
@@ -206,7 +179,7 @@ function Home() {
 
                     </div>
 
-                    {/* Room grid */}
+                    {/* Room Grid */}
                     <div className="room-grid">
 
                         {loading && (
@@ -218,7 +191,7 @@ function Home() {
                         )}
 
                         {!loading && !error && filteredRooms.length === 0 && (
-                            <p>No rooms found.</p>
+                            <p>No rooms from other users are currently available.</p>
                         )}
 
                         {!loading && !error && filteredRooms.map(room => (
@@ -238,7 +211,6 @@ function Home() {
             </div>
 
         </div>
-
     );
 }
 

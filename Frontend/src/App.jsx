@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Chat from "./pages/Chat";
 import Messages from "./pages/Messages";
+import Profile from "./pages/Profile";
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
                 {/* Authentication */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/profile" element={<Profile />} />
 
                 {/* Main application */}
                 <Route path="/home" element={<Home />} />

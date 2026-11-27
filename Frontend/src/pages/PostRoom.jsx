@@ -218,7 +218,10 @@ function PostRoom() {
                             <span>Messages</span>
                         </button>
 
-                        <button className="sidebar-item">
+                        <button
+                            className="sidebar-item"
+                            onClick={() => navigate("/profile")}
+                        >
                             <FiUser />
                             <span>Profile</span>
                         </button>

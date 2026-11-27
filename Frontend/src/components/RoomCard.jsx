@@ -1,11 +1,13 @@
 
 import React from "react";
+
 import {
     FiMapPin,
     FiImage,
     FiUsers,
     FiMessageSquare
 } from "react-icons/fi";
+
 import { useNavigate } from "react-router-dom";
 
 function RoomCard({ room, currentUserId }) {
@@ -18,11 +20,13 @@ function RoomCard({ room, currentUserId }) {
         navigate(`/chat/${room.ownerId}`);
     };
 
-    const isOwnRoom = Number(room.ownerId) === Number(currentUserId);
+    const isOwnRoom =
+        Number(room.ownerId) === Number(currentUserId);
 
     return (
         <div className="room-card">
 
+            {/* Room Images */}
             <div className="room-image-gallery">
 
                 {roomImages.length > 0 ? (
@@ -45,6 +49,7 @@ function RoomCard({ room, currentUserId }) {
 
             </div>
 
+            {/* Room Details */}
             <div className="room-card-content">
 
                 <h3>{room.roomTitle}</h3>
@@ -58,9 +63,12 @@ function RoomCard({ room, currentUserId }) {
                     {room.description}
                 </p>
 
+                {/* Card Footer */}
                 <div className="room-card-footer">
 
-                    <span className={`gender-tag ${room.genderPreference.toLowerCase()}`}>
+                    <span
+                        className={`gender-tag ${(room.genderPreference || "any").toLowerCase()}`}
+                    >
                         <FiUsers />
                         {room.genderPreference}
                     </span>
@@ -84,4 +92,3 @@ function RoomCard({ room, currentUserId }) {
 }
 
 export default RoomCard;
-
