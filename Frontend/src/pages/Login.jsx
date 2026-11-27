@@ -1,6 +1,11 @@
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
+import PublicSidebar from "../components/PublicSidebar";
+import Navbar from "../components/Navbar";
 import { loginUser } from "../services/api";
+
 import InvalidCredentialsCard
     from "../components/InvalidCredentialsCard";
 
@@ -23,7 +28,6 @@ function Login() {
         });
     };
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
@@ -38,8 +42,6 @@ function Login() {
 
             await loginUser(formData);
 
-            // The browser receives the session cookie
-            // through the backend's Set-Cookie response.
             navigate("/home");
 
         } catch (err) {
@@ -57,195 +59,158 @@ function Login() {
         }
     };
 
-
     return (
-        <div className="login-page">
+        <div className="app">
 
-            {/* Header */}
-            <header className="auth-header">
+            <Navbar />
 
-                <div className="auth-logo">
-                    <img
-                        src="/U-dubswap.jfif"
-                        alt="RoomSwap Logo"
-                        className="auth-logo-image"
-                    />
-                </div>
+            <div className="layout">
 
-                <nav className="auth-nav">
+                <PublicSidebar />
 
-                    <Link
-                        to="/login"
-                        className="auth-nav-link active"
-                    >
-                        Login
-                    </Link>
+                <main className="main-content login-main">
 
-                    <Link
-                        to="/register"
-                        className="auth-nav-link"
-                    >
-                        Sign Up
-                    </Link>
+                    <div className="login-card">
 
-                </nav>
+                        <div className="login-heading">
 
-            </header>
+                            <h1>Welcome to U-dubswap</h1>
 
-
-            {/* Main */}
-            <main className="login-main">
-
-                <div className="login-card">
-
-                    <div className="login-heading">
-
-                        <h1>Welcome Back</h1>
-
-                        <p>
-                            Log in to your account
-                        </p>
-
-                    </div>
-
-
-                    <form onSubmit={handleSubmit}>
-
-                        {error && (
-                            <InvalidCredentialsCard message={error} />
-                        )}
-
-
-                        {/* Email */}
-                        <div className="login-form-group">
-
-                            <label htmlFor="email">
-                                Email address
-                            </label>
-
-                            <div className="login-input-wrapper">
-
-                                <svg
-                                    className="login-input-icon"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                >
-                                    <rect
-                                        x="3"
-                                        y="5"
-                                        width="18"
-                                        height="14"
-                                        rx="2"
-                                    />
-
-                                    <path d="m3 7 9 6 9-6" />
-                                </svg>
-
-                                <input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    placeholder="Email address"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    required
-                                />
-
-                            </div>
+                            <p>
+                                Log in to your account
+                            </p>
 
                         </div>
 
+                        <form onSubmit={handleSubmit}>
 
-                        {/* Password */}
-                        <div className="login-form-group">
+                            {error && (
+                                <InvalidCredentialsCard message={error} />
+                            )}
 
-                            <label htmlFor="password">
-                                Password
-                            </label>
+                            <div className="login-form-group">
 
-                            <div className="login-input-wrapper">
+                                <label htmlFor="email">
+                                    Email address
+                                </label>
 
-                                <svg
-                                    className="login-input-icon"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                >
-                                    <rect
-                                        x="5"
-                                        y="10"
-                                        width="14"
-                                        height="10"
-                                        rx="2"
+                                <div className="login-input-wrapper">
+
+                                    <svg
+                                        className="login-input-icon"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                    >
+                                        <rect
+                                            x="3"
+                                            y="5"
+                                            width="18"
+                                            height="14"
+                                            rx="2"
+                                        />
+
+                                        <path d="m3 7 9 6 9-6" />
+
+                                    </svg>
+
+                                    <input
+                                        id="email"
+                                        type="email"
+                                        name="email"
+                                        placeholder="Email address"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        required
                                     />
 
-                                    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-                                </svg>
-
-                                <input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    placeholder="Password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    required
-                                />
+                                </div>
 
                             </div>
 
+                            <div className="login-form-group">
+
+                                <label htmlFor="password">
+                                    Password
+                                </label>
+
+                                <div className="login-input-wrapper">
+
+                                    <svg
+                                        className="login-input-icon"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                    >
+                                        <rect
+                                            x="5"
+                                            y="10"
+                                            width="14"
+                                            height="10"
+                                            rx="2"
+                                        />
+
+                                        <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+
+                                    </svg>
+
+                                    <input
+                                        id="password"
+                                        type="password"
+                                        name="password"
+                                        placeholder="Password"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        required
+                                    />
+
+                                </div>
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="login-button"
+                                disabled={loading}
+                            >
+                                {loading
+                                    ? "Logging in..."
+                                    : "Log In"
+                                }
+                            </button>
+
+                        </form>
+
+                        <div className="forgot-password">
+                            <a href="#forgot-password">
+                                Forgot password?
+                            </a>
                         </div>
 
+                        <div className="login-divider">
 
-                        {/* Login */}
-                        <button
-                            type="submit"
-                            className="login-button"
-                            disabled={loading}
+                            <span></span>
+
+                            <p>OR</p>
+
+                            <span></span>
+
+                        </div>
+
+                        <Link
+                            to="/register"
+                            className="create-account-button"
                         >
-                            {loading
-                                ? "Logging in..."
-                                : "Log In"
-                            }
-                        </button>
-
-                    </form>
-
-
-                    {/* Forgot password */}
-                    <div className="forgot-password">
-                        <a href="#forgot-password">
-                            Forgot password?
-                        </a>
-                    </div>
-
-
-                    {/* OR */}
-                    <div className="login-divider">
-
-                        <span></span>
-
-                        <p>OR</p>
-
-                        <span></span>
+                            Create a new account
+                        </Link>
 
                     </div>
 
+                </main>
 
-                    {/* Create account */}
-                    <Link
-                        to="/register"
-                        className="create-account-button"
-                    >
-                        Create a new account
-                    </Link>
-
-                </div>
-
-            </main>
+            </div>
 
         </div>
     );

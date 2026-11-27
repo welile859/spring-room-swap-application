@@ -1,16 +1,22 @@
-import React, {useState} from "react";
-import {registerUser} from "../services/api.js"
-import {Link, useNavigate} from "react-router-dom"; // EDIT: added useNavigate
+
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
+import { registerUser } from "../services/api.js";
+import Navbar from "../components/Navbar";
+import PublicSidebar from "../components/PublicSidebar";
 
 function Register() {
 
-    const[registered, setRegistered] = useState(false);
-    const[error, setError] = useState(""); // EDIT: stores registration error
-    const navigate = useNavigate(); // EDIT: allows navigation to login
+    const [registered, setRegistered] = useState(false);
+    const [error, setError] = useState("");
+
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
 
-        e.preventDefault(); // EDIT: prevents the form from refreshing the page
+        e.preventDefault();
+        setError("");
 
         const formData = new FormData(e.target);
 
@@ -18,185 +24,149 @@ function Register() {
             fullName: formData.get("fullName"),
             email: formData.get("email"),
             password: formData.get("password")
-        }
+        };
 
         const result = await registerUser(registerRequest);
 
-
-             if (result === "success") {
-                          navigate("/home");
-                   } else {
-                      setError(result);
-                    }
-
-
-    }
+        if (result === "success") {
+            navigate("/home");
+        } else {
+            setError(result);
+        }
+    };
 
     return (
-        <div className="login-page">
+        <div className="app">
 
-            {/* Header */}
-            <header className="auth-header">
+            <Navbar />
 
-                <div className="auth-logo">
-                    <img
-                        src="/U-dubswap.jfif"
-                        alt="RoomSwap Logo"
-                        className="auth-logo-image"
-                    />
-                </div>
+            <div className="layout">
 
-                <nav className="auth-nav">
+                <PublicSidebar />
 
-                    <Link
-                        to="/login"
-                        className="auth-nav-link"
-                    >
-                        Login
-                    </Link>
+                <main className="main-content login-main">
 
-                    <Link
-                        to="/register"
-                        className="auth-nav-link active"
-                    >
-                        Sign Up
-                    </Link>
+                    <div className="login-card">
 
-                </nav>
+                        <div className="login-heading">
 
-            </header>
+                            <h1>Create Account</h1>
 
+                            <p>
+                                Join RoomsSwap and find or share student rooms
+                            </p>
 
-            {/* Main */}
-            <main className="login-main">
+                        </div>
 
-                <div className="login-card">
+                        <form onSubmit={handleSubmit}>
 
-                    <div className="login-heading">
+                            <div className="login-form-group">
 
-                        <h1>Create Account</h1>
+                                <label htmlFor="name">
+                                    Full name
+                                </label>
 
-                        <p>
-                            Join RoomsSwap and find or share student rooms
-                        </p>
+                                <div className="login-input-wrapper">
+
+                                    <input
+                                        id="name"
+                                        type="text"
+                                        name="fullName"
+                                        placeholder="Full name"
+                                        required
+                                    />
+
+                                </div>
+
+                            </div>
+
+                            <div className="login-form-group">
+
+                                <label htmlFor="register-email">
+                                    Email address
+                                </label>
+
+                                <div className="login-input-wrapper">
+
+                                    <input
+                                        id="register-email"
+                                        name="email"
+                                        type="email"
+                                        placeholder="Email address"
+                                        required
+                                    />
+
+                                </div>
+
+                            </div>
+
+                            <div className="login-form-group">
+
+                                <label htmlFor="register-password">
+                                    Password
+                                </label>
+
+                                <div className="login-input-wrapper">
+
+                                    <input
+                                        id="register-password"
+                                        name="password"
+                                        type="password"
+                                        placeholder="Password"
+                                        required
+                                    />
+
+                                </div>
+
+                            </div>
+
+                            <div className="login-form-group">
+
+                                <label htmlFor="confirm-password">
+                                    Confirm password
+                                </label>
+
+                                <div className="login-input-wrapper">
+
+                                    <input
+                                        id="confirm-password"
+                                        type="password"
+                                        placeholder="Confirm password"
+                                        required
+                                    />
+
+                                </div>
+
+                            </div>
+
+                            {error && (
+                                <p className="error-message">
+                                    {error}
+                                </p>
+                            )}
+
+                            <button
+                                type="submit"
+                                className="login-button"
+                            >
+                                Sign Up
+                            </button>
+
+                        </form>
+
+                        <div className="forgot-password">
+
+                            <Link to="/login">
+                                Already have an account? Log in
+                            </Link>
+
+                        </div>
 
                     </div>
 
+                </main>
 
-                    <form onSubmit={handleSubmit}>
-
-                        {/* Full Name */}
-                        <div className="login-form-group">
-
-                            <label htmlFor="name">
-                                Full name
-                            </label>
-
-                            <div className="login-input-wrapper">
-
-                                <input
-                                    id="name"
-                                    type="text"
-                                    name="fullName"
-                                    placeholder="Full name"
-                                />
-
-                            </div>
-
-                        </div>
-
-
-                        {/* Email */}
-                        <div className="login-form-group">
-
-                            <label htmlFor="register-email">
-                                Email address
-                            </label>
-
-                            <div className="login-input-wrapper">
-
-                                <input
-                                    id="register-email"
-                                    name="email" // EDIT: needed for FormData.get("email")
-                                    type="email"
-                                    placeholder="Email address"
-                                />
-
-                            </div>
-
-                        </div>
-
-
-                        {/* Password */}
-                        <div className="login-form-group">
-
-                            <label htmlFor="register-password">
-                                Password
-                            </label>
-
-                            <div className="login-input-wrapper">
-
-                                <input
-                                    id="register-password"
-                                    name="password" // EDIT: needed for FormData.get("password")
-                                    type="password"
-                                    placeholder="Password"
-                                />
-
-                            </div>
-
-                        </div>
-
-
-                        {/* Confirm Password */}
-                        <div className="login-form-group">
-
-                            <label htmlFor="confirm-password">
-                                Confirm password
-                            </label>
-
-                            <div className="login-input-wrapper">
-
-                                <input
-                                    id="confirm-password"
-                                    type="password"
-                                    placeholder="Confirm password"
-                                />
-
-                            </div>
-
-                        </div>
-
-
-                        {/* EDIT: ternary displays error if registration fails */}
-                        {error ? (
-                            <p className="error-message">{error}</p>
-                        ) : null}
-
-
-                        {/* Sign Up */}
-                        <button
-                            type="submit"
-                            className="login-button"
-                        >
-                            Sign Up
-                        </button>
-
-                    </form>
-
-
-                    {/* Login Link */}
-                    <div className="forgot-password">
-
-                        <Link to="/login">
-                            Already have an account? Log in
-                        </Link>
-
-                    </div>
-
-                </div>
-
-            </main>
+            </div>
 
         </div>
     );

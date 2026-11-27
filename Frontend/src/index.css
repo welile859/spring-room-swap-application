@@ -745,3 +745,16 @@ button {
     border: 2px solid #ffffff;
     box-sizing: content-box;
 }
+
+.page-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+.page-header h1 {
+    text-align: center;
+    margin: 0 auto;
+}

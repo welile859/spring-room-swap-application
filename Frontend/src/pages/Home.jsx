@@ -1,23 +1,13 @@
 
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 
-import {
-    FiHome,
-    FiPlusSquare,
-    FiMessageSquare,
-    FiUser,
-    FiLogOut,
-    FiLogIn,
-    FiUserPlus
-} from "react-icons/fi";
-
-import { useNavigate } from "react-router-dom";
-
+import PublicSidebar from "../components/PublicSidebar";
 import Navbar from "../components/Navbar";
 import RoomCard from "../components/RoomCard";
-import { logoutUser } from "../services/api";
 
 function Home() {
+
     const [selectedGender, setSelectedGender] = useState("All");
 
     const [rooms, setRooms] = useState([]);
@@ -26,13 +16,18 @@ function Home() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
-    // Fetch room listings and check whether a user is logged in.
+    const searchTerm = (searchParams.get("search") || "")
+        .trim()
+        .toLowerCase();
+
     useEffect(() => {
+
         const fetchData = async () => {
+
             try {
-                // Retrieve rooms without requiring authentication.
+
                 const roomsResponse = await fetch(
                     "http://localhost:8080/api/rooms"
                 );
@@ -44,7 +39,6 @@ function Home() {
                 const roomsData = await roomsResponse.json();
                 setRooms(roomsData);
 
-                // Check whether the visitor is logged in.
                 const userResponse = await fetch(
                     "http://localhost:8080/api/auth/me",
                     {
@@ -53,53 +47,51 @@ function Home() {
                 );
 
                 if (userResponse.ok) {
+
                     const userData = await userResponse.json();
+
                     setCurrentUserId(Number(userData.userId));
+
                 } else {
-                    // Visitor is not logged in.
+
                     setCurrentUserId(null);
+
                 }
 
             } catch (error) {
+
                 console.error("Error loading home page:", error);
                 setError(error.message);
 
             } finally {
+
                 setLoading(false);
+
             }
         };
 
         fetchData();
+
     }, []);
 
-    // Handle logout.
-    const handleLogout = async () => {
-        try {
-            await logoutUser();
-            setCurrentUserId(null);
-            navigate("/home");
-
-        } catch (error) {
-            console.error("Logout failed:", error);
-        }
-    };
-
-    // Check whether the visitor is logged in.
     const isLoggedIn = currentUserId !== null;
 
-    // Show all rooms to visitors.
-    // Registered users do not see their own room listings.
     const otherUsersRooms = rooms.filter(
         room =>
             !isLoggedIn ||
             Number(room.ownerId) !== currentUserId
     );
 
-    // Filter rooms according to gender preference.
+    const searchedRooms = otherUsersRooms.filter(room =>
+        (room.roomTitle || "")
+            .toLowerCase()
+            .startsWith(searchTerm)
+    );
+
     const filteredRooms =
         selectedGender === "All"
-            ? otherUsersRooms
-            : otherUsersRooms.filter(
+            ? searchedRooms
+            : searchedRooms.filter(
                 room => room.genderPreference === selectedGender
             );
 
@@ -110,99 +102,14 @@ function Home() {
 
             <div className="layout">
 
-                {/* Sidebar */}
-                <aside className="sidebar">
+                <PublicSidebar />
 
-                    <nav className="sidebar-nav">
-
-                        <button className="sidebar-item active">
-                            <FiHome />
-                            <span>Home</span>
-                        </button>
-
-                        <button
-                            className="sidebar-item"
-                            onClick={() =>
-                                navigate(
-                                    isLoggedIn ? "/post-room" : "/login"
-                                )
-                            }
-                        >
-                            <FiPlusSquare />
-                            <span>Post a Room</span>
-                        </button>
-
-                        <button
-                            className="sidebar-item"
-                            onClick={() =>
-                                navigate(
-                                    isLoggedIn ? "/messages" : "/login"
-                                )
-                            }
-                        >
-                            <FiMessageSquare />
-                            <span>Messages</span>
-                        </button>
-
-                        <button
-                            className="sidebar-item"
-                            onClick={() =>
-                                navigate(
-                                    isLoggedIn ? "/profile" : "/login"
-                                )
-                            }
-                        >
-                            <FiUser />
-                            <span>Profile</span>
-                        </button>
-
-                    </nav>
-
-                    {/* Authentication options */}
-                    {isLoggedIn ? (
-
-                        <button
-                            className="sidebar-item logout"
-                            onClick={handleLogout}
-                        >
-                            <FiLogOut />
-                            <span>Logout</span>
-                        </button>
-
-                    ) : (
-
-                        <div className="sidebar-auth">
-
-                            <button
-                                className="sidebar-item"
-                                onClick={() => navigate("/login")}
-                            >
-                                <FiLogIn />
-                                <span>Login</span>
-                            </button>
-
-                            <button
-                                className="sidebar-item"
-                                onClick={() => navigate("/register")}
-                            >
-                                <FiUserPlus />
-                                <span>Register</span>
-                            </button>
-
-                        </div>
-
-                    )}
-
-                </aside>
-
-                {/* Main Content */}
                 <main className="main-content">
 
                     <div className="page-header">
                         <h1>Available Rooms</h1>
                     </div>
 
-                    {/* Filters */}
                     <div className="room-controls">
 
                         <div className="gender-filters">
@@ -231,7 +138,6 @@ function Home() {
 
                     </div>
 
-                    {/* Room Grid */}
                     <div className="room-grid">
 
                         {loading && (
@@ -243,7 +149,12 @@ function Home() {
                         )}
 
                         {!loading && !error && filteredRooms.length === 0 && (
-                            <p>No rooms are currently available.</p>
+                            <p>
+                                {searchTerm
+                                    ? "No rooms found with that name."
+                                    : "No rooms are currently available."
+                                }
+                            </p>
                         )}
 
                         {!loading && !error && filteredRooms.map(room => (
@@ -267,3 +178,4 @@ function Home() {
 }
 
 export default Home;
+

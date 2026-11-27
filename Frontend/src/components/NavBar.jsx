@@ -5,20 +5,37 @@ import {
     FiBell,
     FiUser,
 } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "../services/api";
 
 function Navbar() {
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [unreadCount, setUnreadCount] = useState(0);
+    const [searchTerm, setSearchTerm] = useState("");
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        setSearchTerm(params.get("search") || "");
+    }, [location.search]);
+
+    const handleSearch = (e) => {
+        const value = e.target.value;
+
+        setSearchTerm(value);
+
+        navigate(
+            `/home${value ? `?search=${encodeURIComponent(value)}` : ""}`,
+            { replace: true }
+        );
+    };
 
     useEffect(() => {
 
         let isMounted = true;
 
-        // Retrieve unread conversation count
         const fetchUnreadCount = async () => {
 
             try {
@@ -39,10 +56,8 @@ function Navbar() {
             }
         };
 
-        // Fetch immediately
         fetchUnreadCount();
 
-        // Check for new unread conversations every 5 seconds
         const interval = setInterval(fetchUnreadCount, 5000);
 
         return () => {
@@ -64,17 +79,20 @@ function Navbar() {
             </div>
 
             <div className="navbar-search">
+
                 <FiSearch />
 
                 <input
                     type="text"
-                    placeholder="Search rooms, areas, or universities..."
+                    placeholder="Search rooms by name..."
+                    value={searchTerm}
+                    onChange={handleSearch}
                 />
+
             </div>
 
             <div className="navbar-right">
 
-                {/* Notification Bell */}
                 <button
                     className="icon-button notification-button"
                     onClick={() => navigate("/messages")}
@@ -91,7 +109,6 @@ function Navbar() {
 
                 </button>
 
-                {/* Profile Button */}
                 <button
                     className="profile-button"
                     onClick={() => navigate("/profile")}
@@ -107,3 +124,4 @@ function Navbar() {
 }
 
 export default Navbar;
+
