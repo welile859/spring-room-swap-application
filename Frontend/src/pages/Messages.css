@@ -1,8 +1,10 @@
 
+/* MESSAGES PAGE */
+
 .messages-page {
     min-height: calc(100vh - 70px);
     padding: 30px;
-    background: #f4f7fb;
+    background: var(--background-color);
     box-sizing: border-box;
 }
 
@@ -11,7 +13,7 @@
     max-width: 850px;
     margin: 0 auto;
     background: #ffffff;
-    border: 1px solid #dce4ef;
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     overflow: hidden;
 }
@@ -21,21 +23,23 @@
     align-items: center;
     justify-content: space-between;
     padding: 24px;
-    border-bottom: 1px solid #e5eaf1;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .messages-header h1 {
     margin: 0 0 5px;
-    color: #14294b;
+    color: var(--primary-color);
     font-size: 24px;
     font-weight: 700;
 }
 
 .messages-header p {
     margin: 0;
-    color: #8290a5;
+    color: var(--secondary-text);
     font-size: 13px;
 }
+
+/* New Message Button */
 
 .new-message-button {
     display: flex;
@@ -43,19 +47,21 @@
     height: 40px;
     align-items: center;
     justify-content: center;
-    border: 1px solid #3078e8;
+    border: 1px solid var(--primary-color);
     border-radius: 6px;
     background: #ffffff;
-    color: #3078e8;
+    color: var(--primary-color);
     font-size: 19px;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
 }
 
 .new-message-button:hover {
-    background: #3078e8;
+    background: var(--primary-color);
     color: #ffffff;
 }
+
+/* Conversation List */
 
 .conversation-list {
     display: flex;
@@ -77,12 +83,14 @@
 }
 
 .conversation-item:hover {
-    background: #f5f8fd;
+    background: #f0f8f4;
 }
 
 .conversation-item.selected {
-    background: #edf5ff;
+    background: #e7f4ef;
 }
+
+/* Conversation Avatar */
 
 .conversation-avatar {
     display: flex;
@@ -92,9 +100,11 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: #e8eef7;
-    color: #52667f;
+    background: #e7f4ef;
+    color: var(--primary-color);
 }
+
+/* Conversation Details */
 
 .conversation-details {
     flex: 1;
@@ -103,7 +113,7 @@
 
 .conversation-details h3 {
     margin: 0 0 6px;
-    color: #243853;
+    color: var(--text-color);
     font-size: 14px;
     font-weight: 600;
 }
@@ -111,7 +121,7 @@
 .conversation-details p {
     margin: 0;
     overflow: hidden;
-    color: #8290a5;
+    color: var(--secondary-text);
     font-size: 12px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -120,13 +130,15 @@
 .conversation-time {
     flex-shrink: 0;
     align-self: flex-start;
-    color: #8290a5;
+    color: var(--secondary-text);
     font-size: 11px;
 }
 
+/* Status */
+
 .messages-status {
     padding: 25px;
-    color: #657894;
+    color: var(--secondary-text);
     font-size: 13px;
 }
 
@@ -140,6 +152,8 @@
     font-size: 13px;
 }
 
+/* Empty Messages */
+
 .empty-messages {
     display: flex;
     min-height: 300px;
@@ -147,13 +161,13 @@
     justify-content: center;
     flex-direction: column;
     padding: 30px;
-    color: #8290a5;
+    color: var(--secondary-text);
     text-align: center;
 }
 
 .empty-messages h2 {
     margin: 18px 0 8px;
-    color: #243853;
+    color: var(--primary-color);
     font-size: 19px;
 }
 
@@ -168,7 +182,7 @@
     padding: 11px 20px;
     border: none;
     border-radius: 5px;
-    background: #3078e8;
+    background: var(--primary-color);
     color: #ffffff;
     font-size: 13px;
     font-weight: 600;
@@ -176,8 +190,10 @@
 }
 
 .empty-messages button:hover {
-    background: #2165cf;
+    background: #137779;
 }
+
+/* Mobile Layout */
 
 @media (max-width: 600px) {
 
@@ -206,5 +222,4 @@
     .conversation-details p {
         font-size: 11px;
     }
-
 }

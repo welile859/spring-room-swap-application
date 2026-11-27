@@ -30,9 +30,14 @@ public class ChatMessage {
     @Column(nullable = false)
     private LocalDateTime sentAt;
 
+    // Tracks whether the recipient has read this message
+    @Column(nullable = false)
+    private boolean isRead = false;
+
     @PrePersist
     protected void onCreate() {
         sentAt = LocalDateTime.now();
     }
 }
+
 

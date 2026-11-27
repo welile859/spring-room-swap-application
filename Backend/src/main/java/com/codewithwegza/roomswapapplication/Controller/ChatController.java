@@ -28,6 +28,17 @@ public class ChatController {
         this.sessionService = sessionService;
     }
 
+    @GetMapping("/unread-count")
+    public Long getUnreadMessageCount(HttpServletRequest request) {
+
+        AuthenticatedUser user =
+                sessionService.getAuthenticatedUser(request);
+
+        return chatMessageService.getUnreadConversationCount(
+                user.userId()
+        );
+    }
+
     // Retrieve conversation history with a specific user
     @GetMapping("/messages/{otherUserId}")
     public List<ChatMessageResponse> getConversation(
@@ -62,4 +73,5 @@ public class ChatController {
                 user.userId()
         );
     }
+
 }

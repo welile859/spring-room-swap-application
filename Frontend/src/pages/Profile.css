@@ -1,10 +1,12 @@
 
-/* Profile Page */
+/* PROFILE PAGE */
+
 .profile-page {
     padding-bottom: 40px;
 }
 
 /* Profile Information */
+
 .profile-information {
     display: flex;
     align-items: center;
@@ -12,7 +14,7 @@
     padding: 25px;
     margin-bottom: 25px;
     background: #ffffff;
-    border: 1px solid #e5eaf1;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
 }
 
@@ -24,8 +26,8 @@
     height: 85px;
     flex-shrink: 0;
     border-radius: 50%;
-    background: #e8eef7;
-    color: #52667f;
+    background: #e7f4ef;
+    color: var(--primary-color);
     font-size: 38px;
 }
 
@@ -35,13 +37,13 @@
 
 .profile-user-details h2 {
     margin: 0 0 7px;
-    color: #172b4d;
+    color: var(--primary-color);
     font-size: 21px;
 }
 
 .profile-user-details p {
     margin: 0;
-    color: #8290a5;
+    color: var(--secondary-text);
     font-size: 14px;
 }
 
@@ -50,19 +52,21 @@
     align-items: center;
     gap: 8px;
     padding: 11px 16px;
-    border: 1px solid #dce4ef;
+    border: 1px solid var(--border-color);
     border-radius: 7px;
     background: #ffffff;
-    color: #52667f;
+    color: var(--primary-color);
     font-size: 13px;
     cursor: pointer;
 }
 
 .edit-profile-button:hover {
-    background: #f1f5f9;
+    background: #eef8f4;
+    border-color: var(--highlight-color);
 }
 
 /* Profile Statistics */
+
 .profile-statistics {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -73,23 +77,24 @@
 .profile-stat-card {
     padding: 25px;
     background: #ffffff;
-    border: 1px solid #e5eaf1;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
 }
 
 .profile-stat-card h2 {
     margin: 0 0 8px;
-    color: #3078e8;
+    color: var(--primary-color);
     font-size: 30px;
 }
 
 .profile-stat-card p {
     margin: 0;
-    color: #8290a5;
+    color: var(--secondary-text);
     font-size: 14px;
 }
 
 /* My Rooms */
+
 .my-rooms-section {
     width: 100%;
 }
@@ -103,16 +108,17 @@
 
 .my-rooms-header h2 {
     margin: 0;
-    color: #172b4d;
+    color: var(--primary-color);
     font-size: 20px;
 }
 
 .my-rooms-header span {
-    color: #8290a5;
+    color: var(--secondary-text);
     font-size: 13px;
 }
 
 /* Empty Rooms */
+
 .no-rooms {
     display: flex;
     align-items: center;
@@ -121,10 +127,10 @@
     gap: 15px;
     min-height: 220px;
     padding: 25px;
-    border: 1px dashed #dce4ef;
+    border: 1px dashed var(--border-color);
     border-radius: 12px;
     background: #ffffff;
-    color: #8290a5;
+    color: var(--secondary-text);
     text-align: center;
 }
 
@@ -137,16 +143,17 @@
     padding: 11px 18px;
     border: none;
     border-radius: 7px;
-    background: #3078e8;
+    background: var(--primary-color);
     color: #ffffff;
     cursor: pointer;
 }
 
 .no-rooms button:hover {
-    background: #2165cf;
+    background: #137779;
 }
 
 /* Error */
+
 .profile-error {
     padding: 12px;
     border: 1px solid #f2caca;
@@ -156,6 +163,7 @@
 }
 
 /* Mobile Layout */
+
 @media (max-width: 650px) {
 
     .profile-information {

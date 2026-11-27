@@ -52,14 +52,24 @@ public class ChatMessageService {
         chatMessage.setRecipient(recipient);
         chatMessage.setMessage(messageContent);
 
+        // New messages are unread by default
+        chatMessage.setRead(false);
+
         // Save message
         return chatMessageRepository.save(chatMessage);
     }
 
-    @Transactional(readOnly = true)
+    // Retrieve conversation and mark received messages as read
+    @Transactional
     public List<ChatMessageResponse> getConversation(
             Long userId,
             Long otherUserId) {
+
+        // Mark messages from the other user as read
+        chatMessageRepository.markConversationAsRead(
+                otherUserId,
+                userId
+        );
 
         return chatMessageRepository.findConversation(
                         userId,
@@ -73,6 +83,13 @@ public class ChatMessageService {
                         message.getSentAt()
                 ))
                 .toList();
+    }
+
+    // Count distinct users who have sent unread messages
+    @Transactional(readOnly = true)
+    public Long getUnreadConversationCount(Long userId) {
+
+        return chatMessageRepository.countUnreadSenders(userId);
     }
 
     // Retrieve the user's conversation list

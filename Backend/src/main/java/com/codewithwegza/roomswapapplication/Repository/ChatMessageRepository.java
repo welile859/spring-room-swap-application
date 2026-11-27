@@ -5,6 +5,8 @@ import com.codewithwegza.roomswapapplication.Models.ChatMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -42,5 +44,30 @@ public interface ChatMessageRepository
     List<ChatMessage> findMessagesForUser(
             @Param("userId") Long userId
     );
-}
 
+    // Count distinct users who have sent unread messages
+    @Query("""
+        SELECT COUNT(DISTINCT m.sender.userId)
+        FROM ChatMessage m
+        WHERE m.recipient.userId = :userId
+        AND m.isRead = false
+    """)
+    Long countUnreadSenders(
+            @Param("userId") Long userId
+    );
+
+    // Mark all messages from another user as read
+    @Modifying
+    @Transactional
+    @Query("""
+        UPDATE ChatMessage m
+        SET m.isRead = true
+        WHERE m.sender.userId = :senderId
+        AND m.recipient.userId = :recipientId
+        AND m.isRead = false
+    """)
+    void markConversationAsRead(
+            @Param("senderId") Long senderId,
+            @Param("recipientId") Long recipientId
+    );
+}

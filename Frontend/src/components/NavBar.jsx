@@ -1,12 +1,57 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     FiSearch,
     FiBell,
     FiUser,
 } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 function Navbar() {
+
+    const navigate = useNavigate();
+
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    useEffect(() => {
+
+        let isMounted = true;
+
+        // Retrieve unread conversation count
+        const fetchUnreadCount = async () => {
+
+            try {
+
+                const response = await api.get("/chat/unread-count");
+
+                if (isMounted) {
+                    setUnreadCount(response.data);
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Error retrieving unread message count:",
+                    error
+                );
+
+            }
+        };
+
+        // Fetch immediately
+        fetchUnreadCount();
+
+        // Check for new unread conversations every 5 seconds
+        const interval = setInterval(fetchUnreadCount, 5000);
+
+        return () => {
+            isMounted = false;
+            clearInterval(interval);
+        };
+
+    }, []);
+
     return (
         <header className="navbar">
 
@@ -28,13 +73,33 @@ function Navbar() {
             </div>
 
             <div className="navbar-right">
-                <button className="icon-button">
+
+                {/* Notification Bell */}
+                <button
+                    className="icon-button notification-button"
+                    onClick={() => navigate("/messages")}
+                    aria-label={`Notifications: ${unreadCount} unread conversations`}
+                    title="Unread messages"
+                >
                     <FiBell />
+
+                    {unreadCount > 0 && (
+                        <span className="notification-badge">
+                            {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                    )}
+
                 </button>
 
-                <button className="profile-button">
+                {/* Profile Button */}
+                <button
+                    className="profile-button"
+                    onClick={() => navigate("/profile")}
+                    aria-label="Profile"
+                >
                     <FiUser />
                 </button>
+
             </div>
 
         </header>
